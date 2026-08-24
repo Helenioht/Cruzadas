@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cruzadas de Helenio</title>
+    
+    <!-- Ícone SVG Dourado Integrado (Favicon & Web App Icon) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%231e293b'/><stop offset='100%25' stop-color='%230f172a'/></linearGradient><linearGradient id='gold' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23bf953f'/><stop offset='25%25' stop-color='%23fcf6ba'/><stop offset='50%25' stop-color='%23b38728'/><stop offset='75%25' stop-color='%23fbf5b7'/><stop offset='100%25' stop-color='%23aa771c'/></linearGradient></defs><rect width='512' height='512' rx='108' fill='url(%23bg)' stroke='url(%23gold)' stroke-width='10'/ stroke-opacity='0.5'/><g transform='translate(96, 96)'><rect x='0' y='0' width='90' height='90' rx='16' fill='%230f172a' stroke='url(%23gold)' stroke-width='6'/><text x='45' y='64' font-family='sans-serif' font-weight='900' font-size='56' fill='url(%23gold)' text-anchor='middle'>H</text><rect x='110' y='0' width='90' height='90' rx='16' fill='url(%23gold)'/><rect x='220' y='0' width='90' height='90' rx='16' fill='%230f172a' stroke='url(%23gold)' stroke-width='6'/><text x='265' y='64' font-family='sans-serif' font-weight='900' font-size='56' fill='url(%23gold)' text-anchor='middle'>C</text><rect x='0' y='110' width='90' height='90' rx='16' fill='url(%23gold)'/><text x='45' y='174' font-family='sans-serif' font-weight='900' font-size='56' fill='%230f172a' text-anchor='middle'>Z</text><rect x='110' y='110' width='90' height='90' rx='16' fill='%230f172a' stroke='url(%23gold)' stroke-width='6'/><rect x='220' y='110' width='90' height='90' rx='16' fill='%230f172a' stroke='url(%23gold)' stroke-width='6'/><rect x='0' y='220' width='90' height='90' rx='16' fill='%230f172a' stroke='url(%23gold)' stroke-width='6'/><path d='M 230 230 L 310 150 L 330 170 L 250 250 Z' fill='url(%23gold)'/><path d='M 230 230 L 220 260 L 250 250 Z' fill='%23fcf6ba'/></g></svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a url('https://i.ibb.co/N245pV0g/1000046888.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+
+        /* Título Dourado Metálico */
+        .gold-text {
+            background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.8));
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.80);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Grade e Células */
+        .cw-cell {
+            width: 38px;
+            height: 38px;
+            position: relative;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            transition: all 0.15s ease;
+        }
+
+        .cw-cell input {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #0f172a;
+            caret-color: transparent;
+            cursor: pointer;
+        }
+
+        .cw-cell.cell-block {
+            background-color: #0f172a;
+            border-color: #1e293b;
+        }
+
+        .cw-cell.cell-word {
+            background-color: #fef08a;
+        }
+
+        .cw-cell.cell-active {
+            background-color: #2563eb !important;
+        }
+
+        .cw-cell.cell-active input {
+            color: #ffffff !important;
+        }
+
+        .cw-cell .cell-num {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #475569;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .cw-cell.cell-active .cell-num {
+            color: #ffffff;
+        }
+
+        /* Animações e Validações */
+        .cw-cell.cell-error {
+            background-color: #fecdd3 !important;
+            animation: shake 0.25s ease-in-out;
+        }
+
+        .cw-cell.cell-error input {
+            color: #e11d48 !important;
+        }
+
+        .cw-cell.word-complete {
+            background-color: #dcfce7 !important;
+        }
+
+        .cw-cell.word-complete input {
+            color: #15803d !important;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        /* Dicas */
+        .clue-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .clue-item.active-clue {
+            background-color: #eff6ff;
+            border-left-color: #2563eb;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .clue-item.completed-clue {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.5);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-5 text-slate-800">
+
+    <!-- Cabeçalho com Ícone Visível -->
+    <header class="max-w-7xl mx-auto flex items-center justify-center gap-3 mb-4">
+        <svg class="w-8 h-8 md:w-9 h-9 drop-shadow-md flex-shrink-0" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="headerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#1e293b"/>
+                    <stop offset="100%" stop-color="#0f172a"/>
+                </linearGradient>
+                <linearGradient id="headerGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#bf953f"/>
+                    <stop offset="25%" stop-color="#fcf6ba"/>
+                    <stop offset="50%" stop-color="#b38728"/>
+                    <stop offset="75%" stop-color="#fbf5b7"/>
+                    <stop offset="100%" stop-color="#aa771c"/>
+                </linearGradient>
+            </defs>
+            <rect width="512" height="512" rx="108" fill="url(#headerBg)" stroke="url(#headerGold)" stroke-width="12" stroke-opacity="0.6"/>
+            <g transform="translate(96, 96)">
+                <rect x="0" y="0" width="90" height="90" rx="16" fill="#0f172a" stroke="url(#headerGold)" stroke-width="6"/>
+                <text x="45" y="64" font-family="sans-serif" font-weight="900" font-size="56" fill="url(#headerGold)" text-anchor="middle">H</text>
+                <rect x="110" y="0" width="90" height="90" rx="16" fill="url(#headerGold)"/>
+                <rect x="220" y="0" width="90" height="90" rx="16" fill="#0f172a" stroke="url(#headerGold)" stroke-width="6"/>
+                <text x="265" y="64" font-family="sans-serif" font-weight="900" font-size="56" fill="url(#headerGold)" text-anchor="middle">C</text>
+                <rect x="0" y="110" width="90" height="90" rx="16" fill="url(#headerGold)"/>
+                <text x="45" y="174" font-family="sans-serif" font-weight="900" font-size="56" fill="#0f172a" text-anchor="middle">Z</text>
+                <rect x="110" y="110" width="90" height="90" rx="16" fill="#0f172a" stroke="url(#headerGold)" stroke-width="6"/>
+                <rect x="220" y="110" width="90" height="90" rx="16" fill="#0f172a" stroke="url(#headerGold)" stroke-width="6"/>
+                <rect x="0" y="220" width="90" height="90" rx="16" fill="#0f172a" stroke="url(#headerGold)" stroke-width="6"/>
+                <path d="M 230 230 L 310 150 L 330 170 L 250 250 Z" fill="url(#headerGold)"/>
+                <path d="M 230 230 L 220 260 L 250 250 Z" fill="#fcf6ba"/>
+            </g>
+        </svg>
+        <h1 class="text-xl md:text-2xl font-black tracking-wider uppercase gold-text">
+            Cruzadas de Helenio
+        </h1>
+    </header>
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Painel Lateral: Configurações -->
+        <section class="lg:col-span-4 glass-panel rounded-2xl p-4 text-white shadow-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <h2 class="text-sm font-bold tracking-wide uppercase text-slate-200">Painel de Jogos</h2>
+                    </div>
+                    <button id="exitBtn" class="bg-red-600/80 hover:bg-red-600 text-white text-xs font-semibold px-2.5 py-1 rounded-lg transition duration-200 shadow">
+                        🚪 Sair
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-300 mb-1">Dimensão da Grade</label>
+                        <select id="gridSize" class="w-full bg-slate-800/90 border border-slate-600 rounded-lg p-2 text-xs text-white focus:ring-2 focus:ring-amber-500 outline-none">
+                            <option value="10">10 × 10 (Pequena)</option>
+                            <option value="12" selected>12 × 12 (Média)</option>
+                            <option value="15">15 × 15 (Grande)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-300 mb-1">Origem das Palavras</label>
+                        <select id="wordSource" class="w-full bg-slate-800/90 border border-slate-600 rounded-lg p-2 text-xs text-white focus:ring-2 focus:ring-amber-500 outline-none">
+                            <option value="random">Banco Padrão do Sistema</option>
+                            <option value="custom">Personalizado (Suas Palavras)</option>
+                        </select>
+                    </div>
+
+                    <div id="customWordsArea" class="hidden">
+                        <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-300 mb-1">Lista (PALAVRA: DICA)</label>
+                        <textarea id="customWords" rows="4" class="w-full bg-slate-800/90 border border-slate-600 rounded-lg p-2 text-xs font-mono text-white placeholder-slate-400 focus:ring-2 focus:ring-amber-500 outline-none" placeholder="CASA: Local onde se mora&#10;SOL: Estrela central do sistema solar"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2 mt-5 pt-3 border-t border-white/10">
+                <button id="generateBtn" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-2.5 px-4 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 text-sm">
+                    <span>🧩</span> Gerar Nova Cruzada
+                </button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="checkBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-3 rounded-xl text-xs transition duration-200 flex items-center justify-center gap-1 shadow">
+                        <span>✅</span> Verificar
+                    </button>
+                    <button id="clearBtn" class="bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold py-2 px-3 rounded-xl text-xs transition duration-200 flex items-center justify-center gap-1 shadow">
+                        <span>🗑️</span> Limpar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Área Principal: Grade e Dicas -->
+        <section class="lg:col-span-8 glass-card rounded-2xl p-4 md:p-5 shadow-2xl flex flex-col justify-between">
+            <div class="flex-1 flex flex-col items-center justify-center">
+                <div id="crosswordContainer" class="p-2 bg-slate-900/5 rounded-xl border border-slate-200/80 overflow-x-auto max-w-full">
+                    <p class="text-slate-500 font-medium my-12 text-center text-sm">Clique em "Gerar Nova Cruzada" para iniciar o jogo.</p>
+                </div>
+            </div>
+
+            <!-- Painel de Dicas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-3 border-t border-slate-200">
+                <div>
+                    <h3 class="flex items-center gap-1 font-bold text-xs text-slate-800 uppercase tracking-wider mb-2">
+                        <span class="text-amber-600">➡️</span> Horizontais
+                    </h3>
+                    <ul id="cluesHorizontal" class="text-xs space-y-1 max-h-36 overflow-y-auto pr-1"></ul>
+                </div>
+                <div>
+                    <h3 class="flex items-center gap-1 font-bold text-xs text-slate-800 uppercase tracking-wider mb-2">
+                        <span class="text-amber-600">⬇️</span> Verticais
+                    </h3>
+                    <ul id="cluesVertical" class="text-xs space-y-1 max-h-36 overflow-y-auto pr-1"></ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Parabéns -->
+    <div id="winModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border border-amber-300">
+            <div class="text-4xl mb-2">🏆</div>
+            <h3 class="text-2xl font-black text-slate-900 mb-1">Parabéns!</h3>
+            <p class="text-slate-600 text-sm mb-6">Você completou com sucesso todas as palavras da cruzada!</p>
+            <button id="modalCloseBtn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl shadow transition duration-200">
+                Jogar Novamente
+            </button>
+        </div>
+    </div>
+
+    <footer class="max-w-7xl mx-auto text-center mt-6 text-white/70 text-xs font-medium drop-shadow">
+        <p>✦ Cruzadas de Helenio © 2026 ✦</p>
+    </footer>
+
+    <script>
+        // Sistema de Áudio Interno por Sintetizador (Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'wordSuccess') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.15);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'gameWin') {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const noteOsc = audioCtx.createOscillator();
+                    const noteGain = audioCtx.createGain();
+                    noteOsc.connect(noteGain);
+                    noteGain.connect(audioCtx.destination);
+                    noteOsc.type = 'sine';
+                    noteOsc.frequency.setValueAtTime(freq, now + (idx * 0.12));
+                    noteGain.gain.setValueAtTime(0.15, now + (idx * 0.12));
+                    noteGain.gain.exponentialRampToValueAtTime(0.01, now + (idx * 0.12) + 0.3);
+                    noteOsc.start(now + (idx * 0.12));
+                    noteOsc.stop(now + (idx * 0.12) + 0.3);
+                });
+            }
+        }
+
+        const defaultWords = [
+            { word: "AMOR", clue: "Sentimento de afeto profundo e dedicação" },
+            { word: "CASA", clue: "Edificação destinada à habitação humana" },
+            { word: "SOL", clue: "Estrela central do nosso sistema planetário" },
+            { word: "MAR", clue: "Massa de água salgada que cobre a Terra" },
+            { word: "FOGO", clue: "Desprendimento de luz e calor por combustão" },
+            { word: "ARVORE", clue: "Planta permanente de tronco lenhoso elevado" },
+            { word: "LIVRO", clue: "Obras impressas reunidas em um volume" },
+            { word: "CIDADE", clue: "Povoação maior com complexo urbano" },
+            { word: "GATO", clue: "Pequeno mamífero felino doméstico" },
+            { word: "CAVALO", clue: "Grande mamífero ungulado herbívoro" },
+            { word: "ESCOLA", clue: "Estabelecimento público ou privado de ensino" },
+            { word: "FAMILIA", clue: "Conjunto de pessoas com laços de parentesco" },
+            { word: "NOITE", clue: "Período entre o pôr e o nascer do sol" },
+            { word: "AGUA", clue: "Líquido incolor e inodoro essencial à vida" },
+            { word: "TERRA", clue: "Terceiro planeta em afastamento do Sol" },
+            { word: "FLOR", clue: "Estrutura reprodutiva das plantas angiospermas" },
+            { word: "PAZ", clue: "Estado de tranquilidade e ausência de violência" },
+            { word: "VIDA", clue: "Propriedade que caracteriza os organismos vivos" }
+        ];
+
+        let grid = [];
+        let placedWords = [];
+        let gridSize = 12;
+        let activeDirection = 'horizontal';
+        let activeCell = { r: -1, c: -1 };
+        let completedWordsSet = new Set();
+
+        const wordSourceSelect = document.getElementById('wordSource');
+        const customWordsArea = document.getElementById('customWordsArea');
+        const customWordsTextarea = document.getElementById('customWords');
+        const gridSizeSelect = document.getElementById('gridSize');
+        const generateBtn = document.getElementById('generateBtn');
+        const checkBtn = document.getElementById('checkBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const exitBtn = document.getElementById('exitBtn');
+        const crosswordContainer = document.getElementById('crosswordContainer');
+        const cluesHorizontalEl = document.getElementById('cluesHorizontal');
+        const cluesVerticalEl = document.getElementById('cluesVertical');
+        const winModal = document.getElementById('winModal');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+        wordSourceSelect.addEventListener('change', () => {
+            customWordsArea.classList.toggle('hidden', wordSourceSelect.value !== 'custom');
+        });
+
+        function parseCustomWords(text) {
+            return text.trim().split('\n').map(line => {
+                const parts = line.split(':');
+                if (parts.length >= 2) {
+                    const word = parts[0].trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, '');
+                    const clue = parts.slice(1).join(':').trim();
+                    if (word.length >= 2) return { word, clue };
+                }
+                return null;
+            }).filter(Boolean);
+        }
+
+        function initGrid() {
+            grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
+            placedWords = [];
+            completedWordsSet.clear();
+        }
+
+        function canPlaceWord(word, row, col, direction) {
+            const len = word.length;
+            if (direction === 'horizontal') {
+                if (col + len > gridSize) return false;
+                if (col > 0 && grid[row][col - 1]) return false;
+                if (col + len < gridSize && grid[row][col + len]) return false;
+
+                let intersections = 0;
+                for (let i = 0; i < len; i++) {
+                    const cell = grid[row][col + i];
+                    if (cell) {
+                        if (cell.letter !== word[i]) return false;
+                        intersections++;
+                    } else {
+                        if (row > 0 && grid[row - 1][col + i]) return false;
+                        if (row < gridSize - 1 && grid[row + 1][col + i]) return false;
+                    }
+                }
+                return intersections > 0 || placedWords.length === 0;
+            } else {
+                if (row + len > gridSize) return false;
+                if (row > 0 && grid[row - 1][col]) return false;
+                if (row + len < gridSize && grid[row + len][col]) return false;
+
+                let intersections = 0;
+                for (let i = 0; i < len; i++) {
+                    const cell = grid[row + i][col];
+                    if (cell) {
+                        if (cell.letter !== word[i]) return false;
+                        intersections++;
+                    } else {
+                        if (col > 0 && grid[row + i][col - 1]) return false;
+                        if (col < gridSize - 1 && grid[row + i][col + 1]) return false;
+                    }
+                }
+                return intersections > 0 || placedWords.length === 0;
+            }
+        }
+
+        function placeWord(wordObj, row, col, direction, number) {
+            const word = wordObj.word;
+            for (let i = 0; i < word.length; i++) {
+                const r = direction === 'horizontal' ? row : row + i;
+                const c = direction === 'horizontal' ? col + i : col;
+                if (!grid[r][c]) {
+                    grid[r][c] = { letter: word[i], number: null };
+                }
+            }
+
+            if (!grid[row][col].number) {
+                grid[row][col].number = number;
+            } else {
+                number = grid[row][col].number;
+            }
+
+            placedWords.push({ ...wordObj, row, col, direction, number, id: `${direction}-${row}-${col}` });
+        }
+
+        function fillGrid(wordList) {
+            initGrid();
+            const sorted = [...wordList].sort((a, b) => b.word.length - a.word.length);
+            let numberSequence = 1;
+
+            if (sorted.length === 0) return;
+
+            const first = sorted.shift();
+            const startRow = Math.floor(gridSize / 2);
+            const startCol = Math.max(0, Math.floor((gridSize - first.word.length) / 2));
+            
+            placeWord(first, startRow, startCol, 'horizontal', numberSequence++);
+
+            for (const wordObj of sorted) {
+                let placed = false;
+                for (let r = 0; r < gridSize && !placed; r++) {
+                    for (let c = 0; c < gridSize && !placed; c++) {
+                        for (const dir of ['horizontal', 'vertical']) {
+                            if (canPlaceWord(wordObj.word, r, c, dir)) {
+                                placeWord(wordObj, r, c, dir, numberSequence++);
+                                placed = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function renderGrid() {
+            crosswordContainer.innerHTML = '';
+            cluesHorizontalEl.innerHTML = '';
+            cluesVerticalEl.innerHTML = '';
+
+            const table = document.createElement('table');
+            table.className = 'border-collapse shadow-sm rounded-lg overflow-hidden';
+
+            for (let r = 0; r < gridSize; r++) {
+                const tr = document.createElement('tr');
+                for (let c = 0; c < gridSize; c++) {
+                    const cellData = grid[r][c];
+                    const td = document.createElement('td');
+
+                    if (cellData) {
+                        td.className = 'cw-cell';
+                        td.dataset.row = r;
+                        td.dataset.col = c;
+
+                        if (cellData.number) {
+                            const numSpan = document.createElement('span');
+                            numSpan.className = 'cell-num';
+                            numSpan.textContent = cellData.number;
+                            td.appendChild(numSpan);
+                        }
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.maxLength = 1;
+                        input.autocomplete = "off";
+                        input.dataset.row = r;
+                        input.dataset.col = c;
+
+                        input.addEventListener('click', () => {
+                            if (activeCell.r === r && activeCell.c === c) {
+                                activeDirection = activeDirection === 'horizontal' ? 'vertical' : 'horizontal';
+                            }
+                            setActiveCell(r, c);
+                        });
+
+                        input.addEventListener('input', handleInput);
+                        input.addEventListener('keydown', handleKeyDown);
+
+                        td.appendChild(input);
+                    } else {
+                        td.className = 'cw-cell cell-block';
+                    }
+                    tr.appendChild(td);
+                }
+                table.appendChild(tr);
+            }
+            crosswordContainer.appendChild(table);
+
+            renderClues();
+        }
+
+        function renderClues() {
+            const horizontais = placedWords.filter(w => w.direction === 'horizontal').sort((a, b) => a.number - b.number);
+            const verticais = placedWords.filter(w => w.direction === 'vertical').sort((a, b) => a.number - b.number);
+
+            horizontais.forEach(w => {
+                const li = document.createElement('li');
+                li.className = 'clue-item p-1.5 rounded cursor-pointer hover:bg-slate-100 text-slate-700 leading-tight';
+                li.innerHTML = `<span class="font-bold text-amber-700">${w.number}.</span> ${w.clue}`;
+                li.dataset.id = w.id;
+                li.addEventListener('click', () => focusWord(w));
+                cluesHorizontalEl.appendChild(li);
+            });
+
+            verticais.forEach(w => {
+                const li = document.createElement('li');
+                li.className = 'clue-item p-1.5 rounded cursor-pointer hover:bg-slate-100 text-slate-700 leading-tight';
+                li.innerHTML = `<span class="font-bold text-amber-700">${w.number}.</span> ${w.clue}`;
+                li.dataset.id = w.id;
+                li.addEventListener('click', () => focusWord(w));
+                cluesVerticalEl.appendChild(li);
+            });
+        }
+
+        function focusWord(word) {
+            activeDirection = word.direction;
+            setActiveCell(word.row, word.col);
+            const input = getCellInput(word.row, word.col);
+            if (input) input.focus();
+        }
+
+        function setActiveCell(r, c) {
+            activeCell = { r, c };
+
+            document.querySelectorAll('.cw-cell').forEach(td => {
+                td.classList.remove('cell-active', 'cell-word');
+            });
+            document.querySelectorAll('.clue-item').forEach(el => el.classList.remove('active-clue'));
+
+            const currentInput = getCellInput(r, c);
+            if (!currentInput) return;
+
+            let wordObj = placedWords.find(w => w.direction === activeDirection && isCellInWord(w, r, c));
+            if (!wordObj) {
+                wordObj = placedWords.find(w => isCellInWord(w, r, c));
+                if (wordObj) activeDirection = wordObj.direction;
+            }
+
+            if (wordObj) {
+                for (let i = 0; i < wordObj.word.length; i++) {
+                    const wr = wordObj.direction === 'horizontal' ? wordObj.row : wordObj.row + i;
+                    const wc = wordObj.direction === 'horizontal' ? wordObj.col + i : wordObj.col;
+                    const cellTd = document.querySelector(`td[data-row="${wr}"][data-col="${wc}"]`);
+                    if (cellTd) cellTd.classList.add('cell-word');
+                }
+
+                const clueEl = document.querySelector(`.clue-item[data-id="${wordObj.id}"]`);
+                if (clueEl) {
+                    clueEl.classList.add('active-clue');
+                    clueEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            }
+
+            const activeTd = currentInput.parentElement;
+            if (activeTd) activeTd.classList.add('cell-active');
+        }
+
+        function isCellInWord(w, r, c) {
+            if (w.direction === 'horizontal') {
+                return w.row === r && c >= w.col && c < w.col + w.word.length;
+            } else {
+                return w.col === c && r >= w.row && r < w.row + w.word.length;
+            }
+        }
+
+        function handleInput(e) {
+            const input = e.target;
+            const r = parseInt(input.dataset.row);
+            const c = parseInt(input.dataset.col);
+            const td = input.parentElement;
+
+            input.value = input.value.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, '');
+            const val = input.value;
+
+            td.classList.remove('cell-error');
+
+            if (val) {
+                if (val !== grid[r][c].letter) {
+                    td.classList.add('cell-error');
+                    playSound('error');
+                }
+
+                checkWordCompletions();
+
+                const next = activeDirection === 'horizontal' ? getCellInput(r, c + 1) : getCellInput(r + 1, c);
+                if (next) {
+                    setActiveCell(parseInt(next.dataset.row), parseInt(next.dataset.col));
+                    next.focus();
+                }
+            }
+        }
+
+        function checkWordCompletions() {
+            let newlyCompleted = false;
+
+            placedWords.forEach(wordObj => {
+                if (completedWordsSet.has(wordObj.id)) return;
+
+                let isCorrect = true;
+                for (let i = 0; i < wordObj.word.length; i++) {
+                    const wr = wordObj.direction === 'horizontal' ? wordObj.row : wordObj.row + i;
+                    const wc = wordObj.direction === 'horizontal' ? wordObj.col + i : wordObj.col;
+                    const input = getCellInput(wr, wc);
+                    if (!input || input.value.toUpperCase() !== wordObj.word[i]) {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+
+                if (isCorrect) {
+                    completedWordsSet.add(wordObj.id);
+                    newlyCompleted = true;
+
+                    for (let i = 0; i < wordObj.word.length; i++) {
+                        const wr = wordObj.direction === 'horizontal' ? wordObj.row : wordObj.row + i;
+                        const wc = wordObj.direction === 'horizontal' ? wordObj.col + i : wordObj.col;
+                        const td = getCellInput(wr, wc).parentElement;
+                        td.classList.add('word-complete');
+                    }
+
+                    const clueEl = document.querySelector(`.clue-item[data-id="${wordObj.id}"]`);
+                    if (clueEl) clueEl.classList.add('completed-clue');
+                }
+            });
+
+            if (newlyCompleted) {
+                if (completedWordsSet.size === placedWords.length) {
+                    playSound('gameWin');
+                    winModal.classList.remove('hidden');
+                } else {
+                    playSound('wordSuccess');
+                }
+            }
+        }
+
+        function handleKeyDown(e) {
+            const input = e.target;
+            const r = parseInt(input.dataset.row);
+            const c = parseInt(input.dataset.col);
+
+            if (e.key === ' ') {
+                e.preventDefault();
+                activeDirection = activeDirection === 'horizontal' ? 'vertical' : 'horizontal';
+                setActiveCell(r, c);
+                return;
+            }
+
+            let next = null;
+            if (e.key === 'ArrowRight') next = getCellInput(r, c + 1);
+            if (e.key === 'ArrowLeft') next = getCellInput(r, c - 1);
+            if (e.key === 'ArrowDown') next = getCellInput(r + 1, c);
+            if (e.key === 'ArrowUp') next = getCellInput(r - 1, c);
+
+            if (e.key === 'Backspace' && !input.value) {
+                const prev = activeDirection === 'horizontal' ? getCellInput(r, c - 1) : getCellInput(r - 1, c);
+                if (prev) {
+                    e.preventDefault();
+                    prev.value = '';
+                    prev.parentElement.classList.remove('cell-error');
+                    setActiveCell(parseInt(prev.dataset.row), parseInt(prev.dataset.col));
+                    prev.focus();
+                }
+            }
+
+            if (next) {
+                e.preventDefault();
+                setActiveCell(parseInt(next.dataset.row), parseInt(next.dataset.col));
+                next.focus();
+            }
+        }
+
+        function getCellInput(r, c) {
+            if (r < 0 || c < 0 || r >= gridSize || c >= gridSize) return null;
+            return document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+        }
+
+        function checkAnswers() {
+            let correct = 0;
+            let total = 0;
+
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (grid[r][c]) {
+                        total++;
+                        const input = getCellInput(r, c);
+                        const td = input ? input.parentElement : null;
+                        if (!input || !td) continue;
+
+                        td.classList.remove('cell-error');
+                        const userVal = input.value.toUpperCase();
+
+                        if (userVal === grid[r][c].letter) {
+                            correct++;
+                        } else if (userVal !== '') {
+                            td.classList.add('cell-error');
+                        }
+                    }
+                }
+            }
+
+            alert(`Verificação de Progresso:\n\nAcertos: ${correct} de ${total} letras.`);
+        }
+
+        function clearGrid() {
+            document.querySelectorAll('.cw-cell').forEach(td => {
+                td.classList.remove('cell-error', 'word-complete');
+                const input = td.querySelector('input');
+                if (input) input.value = '';
+            });
+            document.querySelectorAll('.clue-item').forEach(el => el.classList.remove('completed-clue'));
+            completedWordsSet.clear();
+        }
+
+        function exitGame() {
+            crosswordContainer.innerHTML = '<p class="text-slate-500 font-medium my-12 text-center text-sm">Jogo encerrado. Clique em "Gerar Nova Cruzada" para recomeçar.</p>';
+            cluesHorizontalEl.innerHTML = '';
+            cluesVerticalEl.innerHTML = '';
+            grid = [];
+            placedWords = [];
+            completedWordsSet.clear();
+        }
+
+        generateBtn.addEventListener('click', () => {
+            gridSize = parseInt(gridSizeSelect.value);
+            let wordsList = [];
+
+            if (wordSourceSelect.value === 'custom') {
+                wordsList = parseCustomWords(customWordsTextarea.value);
+                if (wordsList.length < 2) {
+                    alert('Insira pelo menos 2 palavras válidas no formato:\nPALAVRA: DICA');
+                    return;
+                }
+            } else {
+                wordsList = [...defaultWords];
+            }
+
+            fillGrid(wordsList);
+            renderGrid();
+        });
+
+        checkBtn.addEventListener('click', checkAnswers);
+        clearBtn.addEventListener('click', clearGrid);
+        exitBtn.addEventListener('click', exitGame);
+        modalCloseBtn.addEventListener('click', () => {
+            winModal.classList.add('hidden');
+            generateBtn.click();
+        });
+    </script>
+</body>
+</html>
